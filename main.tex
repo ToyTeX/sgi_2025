@@ -1,0 +1,91 @@
+\documentclass{tuftebook}
+
+% Font and Encoding
+\usepackage[T1]{fontenc}        % Font encoding
+\usepackage[utf8]{inputenc}     % Input encoding
+\usepackage{mlmodern}           % Latin Modern font
+
+% Math and Symbols
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{physics}            % For physics notation
+\usepackage{amsthm}             % For theorems and proofs
+\usepackage{cancel}             % For canceling terms in math
+
+% Table and Formatting
+\usepackage{booktabs}           % Better tables
+\usepackage{caption}            % Customizing captions
+\usepackage{float}              % Improved interface for floating objects
+\usepackage{tabularx}           % Tables with flexible column widths
+\usepackage{array}              % Extra functionality for tables
+\usepackage{siunitx}            % For units and numerical data
+
+% Figures and Colors
+\usepackage{pdfpages}
+\usepackage{graphicx}           % For including graphics
+\usepackage{xkcdcolors}         % XKCD colors
+\usepackage{tikz}               % For creating graphics programmatically
+\usepackage{tcolorbox}          % For colored boxes
+
+% Algorithm and Listings
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} % For algorithms
+\usepackage{listings}           % For source code listings
+\usepackage[table,xcdraw]{xcolor} % Color support for tables and code
+
+% Hyperlinks and Metadata
+\usepackage{hyperref}           % For hyperlinks
+\hypersetup{
+    colorlinks=true,            % Colored links
+    linkcolor=blue,             % Color of internal links
+    citecolor=blue,             % Color of citation links
+    filecolor=magenta,          % Color of file links
+    urlcolor=blue               % Color of URL links
+}
+
+% Additional Features
+\usepackage{microtype}          % Microtypographical improvements
+\usepackage{epigraph}           % For epigraphs
+\usepackage{nicematrix}         % For nice matrices
+\usepackage{empheq}             % Boxing equations
+\usepackage{lipsum}             % Filler text
+
+% Chapter Formatting
+\usepackage[Sonny]{fncychap}    % Fancy chapter headings
+\numberwithin{equation}{chapter} % Number equations within chapters
+\frenchspacing                   % Use French spacing
+
+\usepackage{theorem}
+
+\begin{document}
+
+\includepdf[pages=1, fitpaper=true]{images/NotesCover.pdf}
+
+\tableofcontents
+\pagestyle{plain}
+\input{chapters/day1}
+\input{chapters/day2}
+\input{chapters/day3}
+\input{chapters/day4}
+\input{chapters/day5}
+
+\input{chapters/Proj1 - MDs (Nicholas Sharp)}
+\input{chapters/Proj2 - SDFs (Odet-Silvia)}
+\input{chapters/Proj3 - INR (Zhang-Marschner)}
+\input{chapters/Proj4 - Eigenvalues (Yingying Yu)}
+
+\input{chapters/Exercises1}
+\input{chapters/Exercises2}
+\input{chapters/Exercises3}
+
+\input{chapters/esoterica}
+
+\footnotesize
+\twocolumn
+\bibliographystyle{acm}
+\bibliography{biblio1}
+\onecolumn
+
+\end{document}

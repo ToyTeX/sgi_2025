@@ -1,0 +1,290 @@
+\chapter{Day 5}
+
+\section{Robust floating point arithmetic}
+
+All programmers worth their salt knows something about floating
+point arithmetic, and how it is complicated. Indeed, the basic idea is
+that since computers have finite memory, representing an infinite collection
+of numbers is a difficult task; the goal is to represent a \emph{decent}
+amount of numbers such that numerical algorithms are useful.
+
+\spa
+
+If we have a \texttt{flt32} value combosed of an exponent, sign and the
+number itself, arithmetic operations to them always have a necessary
+rounding error due to how the binary arithmetic is carried out in the
+computer. We can abstract this away using floating point arithmetic,
+and resolve such problems with representation alternatives. \cite{float1}
+
+\spa
+
+Generally, one can see floating point arithmetic as resembling a monoid, as it is \emph{non-associative}, but commutative,
+with the \emph{floating bit} operations $\{\oplus, \ominus, \otimes\}$
+of \emph{sum, subtraction} and \emph{multiplication}. Here are some
+important results \cite{artof1}:
+
+\begin{tcolorbox}[colback=white, colframe=blue!10!black, title=\textbf{Floating Point Arithmetic I : Theorems} ]
+
+\begin{itemize}
+    \item \textbf{Floating Point Number Representation Theorem:}
+    If $x \in \RR$ in the \emph{floating point range},
+    that is, it doesn't over/underflow, then there exists a floating
+    point representation $\text{fl}(x)$:
+    \begin{align*}
+        \forall x \in \RR,\ \exists|\varepsilon| \le \varepsilon_{\text{computer}}, \ \text{fl}(x)=x(1+\varepsilon)
+    \end{align*}
+
+    \item \textbf{Floating Point Operation Representation Theorem:}
+    If we have two real numbers $(x,y)$, and we perform a arithmetic
+    operation $(\cdot)$ to them, the corresponding floating point
+    operation $(\odot)$ is:
+    \begin{align*}
+        \forall x,y \in \RR,\ x\odot y =\text{fl}(x\cdot y)
+    \end{align*}
+
+    \item \textbf{Fundamental Axiom of Floating Point Arithmetic:}
+    The real valued result $z$ of a floating point operation can be derived
+    from the previous two theorems:
+    \begin{align*}
+        \forall x,y \in \RR,\ \exists|\varepsilon| \le \varepsilon_{\text{computer}}, \ x\odot y = (x\cdot y)(1+\epsilon)
+    \end{align*}
+    
+\end{itemize}
+
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=white, colframe=blue!30!black, title=\textbf{Floating Point Arithmetic II : Identities} ]
+
+\begin{itemize}
+    \item \textbf{Commutative Law:} $x \odot y = y \odot x$
+    \item \textbf{Sign reversion:} $x \ominus y = x \oplus (-y)$
+    \item \textbf{Sign distribution:} $-(x \oplus y) = -x \oplus -y$
+    \item \textbf{Additive inverse:} $x \oplus y = 0 \implies x=-y$
+    \item \textbf{Parity:} $\text{fl}(-x) = -\text{fl}(x)$
+\end{itemize}
+
+\end{tcolorbox}
+
+Many interesting things can be said of this type of monoid, but often
+we only care about the most useful or practical results. For example,
+let's suppose you want to check if two numbers are \emph{equal}. Equality
+is far too strong a constraint considering the sensitivity of floats, they will
+rarely be the same.
+
+\spa
+
+So we instead use a \emph{tolerance bound} of the form $|x-y|<\varepsilon$
+or, interestingly, we can use the first theorem to make something
+$|x-y|/|x| < \varepsilon$, where we adjust $\varepsilon$ to be on
+an acceptable error order.
+
+\spa
+
+There are many other good habits regardings writing down algorithms
+and code taking into consideration floating points, such as
+\emph{clamping} functions (e.g $\sqrt{x} \rightarrow \sqrt{\max(x,0)}$),
+perturbing singular functions 
+($|x|^{-1} \rightarrow (|x| + \varepsilon)^{-1}$) or
+($A^{-1}x=y \rightarrow (A+\varepsilon I)^{-1}x=y$),
+and changing trigonometric representations \cite{float3}.
+The discussion in \cite{float2} gives thorough examples of how
+to convert particular expressions into more palatable ones for the
+computer after lengthy analysis. The 
+\href{https://herbie.uwplse.org/demo/}{Herbie Project} does these
+automatically.
+
+\spa
+
+An alternate approach is only using the field of rational numbers
+$\mathbb{Q}$, discussed in section 4.5 of \cite{artof1}; 
+one can express a rational data type in a couple of ways,
+but mostly the idea is to completely eliminate rounding errors at the
+cost of large integer values. Other systems such as
+\emph{posits} \cite{posit} have also been proposed.
+
+\subsection{Predicates and constructions}
+
+The founding resource in the topic is \cite{predicate1} by professor
+\href{http://people.eecs.berkeley.edu/~jrs/}{Jonathan  Shewchuk},
+and some notes on the 
+\href{https://doc.cgal.org/Manual/3.1/doc_html/cgal_manual/Kernel_23/Chapter_predicates_constructions.html}{\emph{CGAL}} library.
+
+\begin{itemize}
+    \item \textbf{Predicate:} a query with an answer on a small
+    discrete set (often true/false)
+
+    \item \textbf{Constructions:} an intermediate real quantity
+    constructed from other reals
+\end{itemize}
+
+Honestly, will take some time for me to make sense of this. I'll leave it
+for now.
+
+
+\subsection{Interval arithmetic}
+
+Wheter it's to render an implicit surface, compute the intersection
+of meshes or parametric objects, or even to generally compute
+intersection queries, due to finite floating point precision and
+the previously mentioned error bounds $\varepsilon$, it's of our
+interest to produce a robust method to deal with \emph{intervals
+of values}, rather than directly with the values themselves.
+P. 225 of \cite{artof1}.
+
+\spa
+
+For example, solving collision detection problems involves
+solving many polynomial roots \cite{inter2}, take this one:
+
+\begin{align*}
+ &f(x) = 333.75y^6 + x^2(11x^2y^2 - y^6 - 121y^4 - 2) + 5.5y^8 + x/(2y), 
+ \\
+ &x = 77617, y = 33096 \implies f_1 \approx 1.17, f_2 \approx -0.82
+\end{align*}
+
+Where $f_1$ is wrong and evaluated by the computer. 
+The reason for such a failure is floating point error, as expected.
+However. we can notices the values do fall in \emph{some} finite close
+range. If rather than evaluating the root exactly, we evaluate the
+approximate \emph{interval} it falls in, we can make a more stable
+algorithm.
+
+\spa
+
+As per \cite{inter1}, we can produce maps $J:x \in \mathbb{F}\rightarrow
+[a,b]$ such that under addition and zero they form a commutative monoid
+over the classic $\{\cdot, 1\}$ and $\{+,0\}$ pairs with also the classic
+absorption rule for multiplication. The map is $1\rightarrow[1,1]$ and
+$0\rightarrow[0,0]$. This constitutes a interval ordering as well:
+
+
+\begin{tcolorbox}[colback=white, colframe=red!10!black, title=\textbf{Interval Arithmetic I : Identities} ]
+
+\begin{itemize}
+    \item  $[a,b]+[c,d] = [a+c,b+d]$
+    \item  $[a,b]\cdot[c,d] = [\min(ac,ad,bc,bd), \max(ac,ad,bc,bd)]$
+    \item  $[a,b]/[c,d] = [a,b]\cdot[1/d, 1/c]$
+    \item  $[a,b]^2 = [0, \max(a^2,b^2)], \quad \text{when } 0 \in [a,b]$
+    \item  $\exp[a,b] = [\exp(a), \exp(b)]$
+    \item Ordering: 
+    \begin{align*}
+&([a, b]<[c, d]):=(b<c) \\
+&([a, b]>[c, d]):=(a>d)\\
+&([a, b] \subseteq[c, d]):=(a \geq c) \wedge(b \leq d)\\
+&([a, b] \supseteq[c, d]):=(a \leq c) \wedge(b \geq d)  \\
+\end{align*}
+\end{itemize}
+
+\end{tcolorbox}
+
+There are actually extensions of this method as well. For example,
+\emph{Rounded Interval Arithmetic} (RIA) \cite{inter5, inter6}
+takes into consideration the \texttt{ulp} associated to each floating
+point number when rounding elements associated to each interval; this is good
+as it allows for more secure computing of singularities of curves and such.
+
+\section{Linear solvers}
+
+
+
+\begin{table*}[h] \centering
+%\ra{1.3}
+\begin{small}
+\begin{tabular}{@{}lll@{}}\toprule
+\textbf{Dense linear} & \textbf{Dimen.} & \textbf{Note} \\ \midrule
+\textbf{Dense linear w/ constraints} & 0/3 & 52  \\ \hdashline
+\textbf{Sparse linear} & 1/3 & 88  \\ \hdashline
+\textbf{Sparse linear w/ constraints} & 1/3 & 71  \\ \hdashline
+\textbf{Quadratic and cone} & 2/3 & 60  \\ \hdashline
+\textbf{Mixed integer} & 2/3 & 55\\ \hdashline
+\textbf{Nonlinear} & 2/3 & 60  \\ \hdashline
+\textbf{Beyond} & 2/3 & 55\\ \hdashline
+\bottomrule
+\end{tabular}
+\end{small}
+\caption{Types of linear solvers, from fast and stable to
+slow and risky}
+\end{table*}
+
+Quantum the
+
+\section{(Bad) Surface Meshes}
+
+Generally speaking, most real world data comes, first, in a variety
+of formats, so we can't pick and choose which ones to work with, and
+have to make do with what's handed to us.
+
+\spa
+
+Second, the character of even triangle meshes is often times
+buggy, innapropriate, at times incompatible with most algorithms
+and data structures, and so it is critical that, when we write
+algorithms and methods, we annotate well the assumptions about
+our given data, and identificate all possible defects with our
+test meshes. Some good habits:
+
+
+\begin{itemize}
+    \item \textbf{What is bad data?}
+        \begin{itemize}
+            \item Unreferenced vertices
+            \item Repeated vertices in faces
+            \item Faces of wrong degree
+            \item Geometrically degenerate faces
+            \item Spurious topology (holes and handles)
+            \item Nonmanifold
+            \item Non-orientable
+            \item Foldover faces
+            \item Disconnected components
+            \item Poorly tessellated
+        \end{itemize}
+    
+    \item \textbf{Can you load it?}
+    \begin{itemize}
+        \item Many libraries/data structures will reject bad data
+        \item Use the weakest data structure you can
+    \end{itemize}
+
+    \item \textbf{Per-face computation}
+    \begin{itemize}
+        \item If possible, just loop over faces
+    \end{itemize}
+
+    \item \textbf{Patches}
+    \begin{itemize}
+        \item Split to manifold/orientable patches accordingly
+    \end{itemize}
+\end{itemize}
+
+
+\subsection{Remeshing}
+
+Given a \emph{bad} mesh, how can we turn it into a \emph{good} one?
+This depends on the properties we want the mesh to have, like how fine
+it is or even the kind of polygon we desire, how robust and numerically
+stable it is, if it requires manual fiddling, all that stuff.
+
+\spa
+
+But, generally, there are many good "objective" parameters for mesh quality
+such as the ones mentioned previously, which means we can produce numeric
+metrics for those and then attempt to estabilish some idealized mesh from them.
+
+\spa
+
+To this merit there dozens of techniques, all different. A simple one,
+for example, is the production of many curvature aligned cross fields
+in the objects surface \cite{remesh2}, 
+a way of drawing their contours in a sense, and 
+producing a square mesh from it. Another method, also using cross fields,
+is the \emph{instant mesh alignment} \cite{remesh1} which develops
+rotationally congruent fields of seams.
+
+\spa
+
+It seems interesting to further investigate these methods in detail.
+
+\section{Simulations and PDEs}
+
+
+

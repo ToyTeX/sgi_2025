@@ -1,0 +1,185 @@
+\ProvidesPackage{mytheorems}[2024/07/29 v1.1 Package to define theorem environments with white backgrounds]
+
+% Load required packages
+\RequirePackage{mdframed}
+\RequirePackage{thmtools}
+\RequirePackage{xcolor}
+
+% Define theorem styles
+
+% Style for definitions with white background
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{black}, 
+    bodyfont=\normalfont, 
+    mdframed={
+        linewidth=1pt,
+        roundcorner=5pt,
+        backgroundcolor=white,
+        linecolor=black,
+        innertopmargin=10pt,
+        innerbottommargin=10pt,
+        innerrightmargin=10pt,
+        innerleftmargin=10pt,
+        skipabove=10pt,
+        skipbelow=10pt
+    }
+]{thmgreenbox}
+
+% Style for theorems and corollaries with white background
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{black}, 
+    bodyfont=\normalfont, 
+    mdframed={
+        linewidth=1pt,
+        roundcorner=5pt,
+        backgroundcolor=white,
+        linecolor=black,
+        innertopmargin=10pt,
+        innerbottommargin=10pt,
+        innerrightmargin=10pt,
+        innerleftmargin=10pt,
+        skipabove=10pt,
+        skipbelow=10pt
+    }
+]{thmredbox}
+
+% Style for examples with white background
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{black}, 
+    bodyfont=\normalfont, 
+    mdframed={
+        linewidth=1pt,
+        roundcorner=5pt,
+        backgroundcolor=white,
+        linecolor=black,
+        innertopmargin=10pt,
+        innerbottommargin=10pt,
+        innerrightmargin=10pt,
+        innerleftmargin=10pt,
+        skipabove=10pt,
+        skipbelow=10pt
+    }
+]{thmbluebox}
+
+% Define theorem environments
+\declaretheorem[numberwithin=chapter, style=thmgreenbox, name=Definition]{definition}
+\declaretheorem[sibling=definition, style=thmredbox, name=Theorem]{theorem}
+\declaretheorem[sibling=definition, style=thmredbox, name=Corollary]{corollary}
+\declaretheorem[sibling=definition, style=thmbluebox, name=Example]{example}
+
+
+\ProvidesPackage{proofs}[2024/07/31 Proof environment package with grey bar]
+
+\RequirePackage{mdframed}
+\RequirePackage{amsthm}
+\RequirePackage{xcolor}
+
+% Define a custom style for the proof environment
+\newmdenv[
+  linecolor=gray,
+  linewidth=2pt,
+  leftline=true,
+  rightline=false,
+  topline=false,
+  bottomline=false,
+  backgroundcolor=white,
+  skipabove=10pt,
+  skipbelow=10pt,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  innertopmargin=10pt,
+  innerbottommargin=10pt,
+  splittopskip=10pt,
+  frametitleaboveskip=\topsep,
+  frametitlebelowskip=\baselineskip,
+  frametitlerule=0pt,
+  framecolor=gray!30
+]{proofbox}
+
+% Define the proof environment using the custom style
+\newtheoremstyle{proofstyle}%
+  {0pt}%
+  {0pt}%
+  {\normalfont}%
+  {}%
+  {\bfseries\sffamily}%
+  {}%
+  {\newline}%
+  {}%
+  
+\theoremstyle{proofstyle}
+\newtheorem*{replacementproof}{Proof}
+
+\renewenvironment{proof}[1][\proofname]{%
+  \begin{proofbox}
+  \begin{replacementproof}[#1]}{%
+  \end{replacementproof}
+  \end{proofbox}}
+
+
+  \let\bf\mathbf % Define \bf to be equal to \mathbf
+  \newcommand{\spa}{\vspace{\baselineskip}}
+
+ \def\NN{\mathbb{N}} % natural numbers
+ \def\ZZ{\mathbb{Z}} % integers
+ \def\RR{\mathbb{R}} % reals
+ \def\CC{\mathbb{C}} % complex numbers
+ \def\HH{\mathbb{H}} % quaternions
+
+ \DeclareMathOperator{\re}{Re} % real part
+ \DeclareMathOperator{\im}{Im} % imaginary part
+
+ % sans-serif macros for matrices and vectors (to avoid conflicts with often heavily overloaded notation)
+\newcommand{\T}{\mathsf{T}} % transpose
+\newcommand{\Asf}{\mathsf{A}}
+\newcommand{\Bsf}{\mathsf{B}}
+\newcommand{\Csf}{\mathsf{C}}
+\newcommand{\Dsf}{\mathsf{D}}
+\newcommand{\Esf}{\mathsf{E}}
+\newcommand{\Fsf}{\mathsf{F}}
+\newcommand{\Gsf}{\mathsf{G}}
+\newcommand{\Hsf}{\mathsf{H}}
+\newcommand{\Isf}{\mathsf{I}}
+\newcommand{\Jsf}{\mathsf{J}}
+\newcommand{\Ksf}{\mathsf{K}}
+\newcommand{\Lsf}{\mathsf{L}}
+\newcommand{\Msf}{\mathsf{M}}
+\newcommand{\Nsf}{\mathsf{N}}
+\newcommand{\Osf}{\mathsf{O}}
+\newcommand{\Psf}{\mathsf{P}}
+\newcommand{\Qsf}{\mathsf{Q}}
+\newcommand{\Rsf}{\mathsf{R}}
+\newcommand{\Ssf}{\mathsf{S}}
+\newcommand{\Tsf}{\mathsf{T}}
+\newcommand{\Usf}{\mathsf{U}}
+\newcommand{\Vsf}{\mathsf{V}}
+\newcommand{\Wsf}{\mathsf{W}}
+\newcommand{\Xsf}{\mathsf{X}}
+\newcommand{\Ysf}{\mathsf{Y}}
+\newcommand{\Zsf}{\mathsf{Z}}
+\newcommand{\asf}{\mathsf{a}}
+\newcommand{\bsf}{\mathsf{b}}
+\newcommand{\csf}{\mathsf{c}}
+\newcommand{\dsf}{\mathsf{d}}
+\newcommand{\esf}{\mathsf{e}}
+\newcommand{\fsf}{\mathsf{f}}
+\newcommand{\gsf}{\mathsf{g}}
+\newcommand{\hsf}{\mathsf{h}}
+\newcommand{\isf}{\mathsf{i}}
+\newcommand{\jsf}{\mathsf{j}}
+\newcommand{\ksf}{\mathsf{k}}
+\newcommand{\lsf}{\mathsf{l}}
+\newcommand{\msf}{\mathsf{m}}
+\newcommand{\nsf}{\mathsf{n}}
+\newcommand{\osf}{\mathsf{o}}
+\newcommand{\psf}{\mathsf{p}}
+\newcommand{\qsf}{\mathsf{q}}
+\newcommand{\rsf}{\mathsf{r}}
+\newcommand{\ssf}{\mathsf{s}}
+\newcommand{\tsf}{\mathsf{t}}
+\newcommand{\usf}{\mathsf{u}}
+\newcommand{\vsf}{\mathsf{v}}
+\newcommand{\wsf}{\mathsf{w}}
+\newcommand{\xsf}{\mathsf{x}}
+\newcommand{\ysf}{\mathsf{y}}
+\newcommand{\zsf}{\mathsf{z}}

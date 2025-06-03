@@ -1,0 +1,191 @@
+\chapter{Day 2}
+
+\section{Mesh Parametrization}
+
+\begin{definition}[UV Maps]
+
+The idea is we want to "squish" or "flatten" our 3D mesh into a snug
+2D projection, an image. This produces a \emph{\textbf{UV map}}, and
+the procedure in abstract is to assign a subset of 3D space 
+$V$ contained by edges to a domain in 2D space $\Omega$:
+
+\begin{align*}
+    U: V\subset \RR^3 \rightarrow \Omega \subset \RR^2
+\end{align*}
+    
+\end{definition}
+
+If the edge is a closed object, like a cube, obviously if you try to squish
+it, some bits of the cube will be on top of each other, so a no-go to
+a UV map. What can be done is cheating; you cut some bits of the original
+3D object first so that it becomes "flattable".
+
+\spa
+
+This procedure of incision is sucessful once we reach a
+\emph{disk topology}, containing a single boundary loop. Some meshes
+require that we make multiple seams and separate multiple sections into
+little "UV islands"; this can be done for semantic or mathematical
+purposes. Our objective in parametrization is to minimize
+\emph{distortion} and the number of cuts.
+
+\subsection{Springs algorithm (Tutte Embedding)}
+
+A basic mesh parametrization algorithm treats the entire mesh as a
+set of springs with different elastic coefficients; we want to
+"relax" the whole mesh by allowing the springs to stretch until they're
+flat and constrained to some boundary. This is known as a
+\emph{\textbf{force-directing algorithm}} for making planar graphs.
+A \href{https://www.youtube.com/watch?v=WWm-g2nLHds&list=PLubYOWSl9mIvtnRjCCHP3wqNETTHYjQex}{good playlist.}
+
+\spa
+
+This is the same as trying to minimize the potential energy $U$
+of the entire system of springs.
+
+\begin{align*}
+\min_{U} \sum_{\{i,j\} \in \bf{E}} w_{ij}\bf{||u_j-u_i||}^2
+\approx \min_{\text{Pot. energy}} \sum_{\text{vertices}} k\bf{x}^2
+\end{align*}
+
+We can numerically solve the relaxation of springs by looking at a basic
+$2k\bf{x}=0$ idea:
+
+\begin{align*}
+\frac{\partial U}{\partial\bf{u}_i}=\sum_{\{i\,j\}} 2w_{ij} 
+(\bf{u}_i-\bf{u}_j)=0 \approx 2k\bf{x}=0
+\end{align*}
+
+The spring potential $k$ represented by the stiffness of each edge
+$w_{ij}$ can be adjusted to not be a constant, but rather depend on
+something. Following \cite{param1stanford}, we have:
+
+\begin{itemize}
+    \item \textbf{Uniform weights:} The stiffness of every spring
+    is equal. This relaxes them all into equilateral triangles.
+
+    \item \textbf{Harmonic weights:} Dependant on adjacent angles
+    between faces to imitate a conformal transformation. According
+    to \emph{Lemma 1} in \cite{minimal1}, it comes about from
+    minimizing the total discrete \emph{Dirichlet Energy}.
+
+    \item \textbf{Mean-value weights:} Using barycentric coordinates,
+    explained below, we can produce weights that are always positive
+    and precise in the linear sense.
+\end{itemize}
+
+Following \cite{param2sheffer}
+
+\spa
+
+\subsection{Distortion}
+
+The amount of distortion a mesh has is measured by the Jacobian, which
+tells you the total infinitesimal variation in a volume element across
+all directions.
+
+\begin{align*}
+    J_f = U\Sigma V^T = U
+\begin{pmatrix}
+\sigma_1 & 0\\
+ 0 & \sigma_2\\
+ 0 & 0
+\end{pmatrix}
+V^T
+\end{align*}
+
+We can split this into three cases.
+
+\begin{itemize}
+    \item \textbf{Area preserving (Equiareal):} 
+    If $\text{det}(J_A^2)=\text{det}(J_B^2)$, this implies
+    $\sigma_1 \sigma_2 = 1$.
+    
+    \item \textbf{Conformal (Equiangular):} If there exists a scalar function
+    $\phi(u,v)$ that perfectly offsets the variation of the original
+    area, such that $J_A^2 = \phi J_B^2$, this is conformal, and it
+    implies $\sigma_1=\sigma_2$.
+    
+    \item \textbf{Isometric:} If the transformation is both
+    conformal and equiareal, then it is isometric, and therefore implies
+    $J^2_A = J^2_B$, which implies $\sigma_1=\sigma_2=1$.
+\end{itemize}
+
+\href{https://github.com/alecjacobson/geometry-processing-parameterization}{Jaconson's course}
+
+\subsection{Barycentric Interpolation}
+
+As per the original floater article \cite{floater1}, as well
+as his more explanatory article \cite{floater2}, the basic idea is that
+the coordinates \emph{inside} of a triangle $T$ composed of vertices
+$\bf{v_1, v_2}$ and $\bf{v_3}$ are linear superpositions of the
+vertices scaled by a ratio of the area of the triangles formed by each
+vertex and the total triangle area:
+
+
+\begin{align*}
+\bf{x} &= \lambda_1 \bf{v_1} + \lambda_2 \bf{v_2} 
++ \lambda_3 \bf{v_3} \\
+\\
+\lambda_i&=
+\begin{pmatrix}
+\text{Area of} \\
+\text{triangle made of} \\
+\text{base edge } \bf{v}_i
+\end{pmatrix}
+\bigg/
+\begin{pmatrix}
+\text{Total area} \\
+\text{of triangle}
+\end{pmatrix}
+\end{align*}
+
+The construction can actually be generalized to any convex polygon
+(altough not at all polygons will produce bijective maps \cite{barycentric1})
+but we'll stick to triangles. The original motivation of this
+system was to mimic \emph{harmonic maps} by piecewise linear maps, that
+is, allow a conformal transformation to be more easily carried out.
+
+\spa
+
+Suppose we had a harmonic function $\Delta f = 0$. If we wish to
+approximate $f$ by regarding a boundary condition 
+$u(\partial \Omega) = u_0$. We want to produce some triangulation
+$\mathcal{T}$ whose values of interior edge lengths and angles
+look like a conformal map. This then produces a system of equations
+that is exactly that of mean value, or barycentric coordinates.
+
+\spa
+
+For mesh parametrization, we want to follow
+the procedure outlined in section 5.4 of \cite{floater2}.
+Suppose we have a mesh $\bf{M}(E,V, F)$, where $E$ are its edges,
+$V$ its vertices and $F$ its faces. Then the \emph{boundary of the mesh}
+$\partial\bf{M}$ produces a \emph{boundary polygon}.
+
+\spa
+
+Our goal is to, as per the Tutte embedding, map the boundary polygon
+into another convex polygon fixed in the UV plane, and then make all
+other triangles of the mesh be convex combinations of their neighbors
+in such a fashion as to fill the UV plane.
+
+\spa
+
+Mean coordinates can also be extended to non-convex polygons.
+
+\section{Texture mapping and optimization}
+
+\subsection{Mapping}
+
+Supposing we express a mesh $\bf{M(u,v)}$ in these UV coordinates,
+we can store image data in the UV plane and then map this back to the
+original mesh to get colors on our mesh.
+
+\spa
+
+The basic method is a \emph{\textbf{triangle soup}} mapping, which
+obliterates connectivity information in return for a completely
+isometric mapping to the UV space.
+
+\subsection{Optimization}

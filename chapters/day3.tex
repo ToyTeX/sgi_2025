@@ -1,0 +1,142 @@
+\chapter{Day 3}
+
+\section{Geometric data}
+
+It takes much effort to represent shapes in a virtual environment. Since
+we only have finite memory and processing power, it is wise to implement
+different data types for representing different constructs.
+
+\spa
+
+For example, when scanning real objects we're not really able to infer the
+contextual information regarding certain features; therefore, we end up with
+simple points in 3D space, which are clouds, but if you want to represent something
+akin to a curve or do precision engineering work, you might want a mathematically
+parametrized surface, since those don't suffer from finite resolution and can
+be modified indefinitely.
+
+\begin{table*}[h] \centering
+%\ra{1.3}
+\begin{small}
+\begin{tabular}{@{}lll@{}}\toprule
+\textbf{Data Type} & \textbf{Dimen.} & \textbf{Note} \\ \midrule
+\textbf{Point clouds} & 0/3 & 52  \\ \hdashline
+\textbf{Polylines} & 1/3 & 88  \\ \hdashline
+\textbf{Splines} & 1/3 & 71  \\ \hdashline
+\textbf{Implicit Surfaces} & 2/3 & 60  \\ \hdashline
+\textbf{Parametric surfaces} & 2/3 & 55\\ \hdashline
+\bottomrule
+\end{tabular}
+\end{small}
+\caption{Data types and their corresponding co-dimensionality as well
+as use in embedded spaces. Point clouds are, for example, 0-dimensional
+entities that can be embedded in 3D space.}
+\end{table*}
+
+\subsection{Point Clouds}
+
+Still don't know much about them besides just being an aggregate cluster of
+coordinates.
+
+\subsection{Splines / Curves}
+
+Discretize a curve $\gamma(t)$ into a set of finite points
+by using splines, which are simple parametrizations that obey
+certain differentiability rules; see 
+\href{https://www.youtube.com/watch?v=aVwxzDHniEw}{Freya Holmer's talk
+on Bezier's} and on the 
+\href{https://www.youtube.com/watch?v=jvPPXbo87ds}{the continuity of
+splines}.
+
+\subsection{Implicit Shape Representations}
+
+\emph{Implicit Shape Representations} are of the form 
+$f(\bf{x})=0$; this differs from \emph{parametric} forms
+of characterizing $g(u,v)$. One of the major advantages is the
+ease of computing intersections \cite{ray1} by means of a
+bounding hierarchy and a simple algorithm to check
+wheter a ray $\bf{r}(t)=\bf{a}+t\bf{b}$ crosses
+it or not.
+
+\spa
+
+Further, these implicit surfaces can also have constructive
+geometric operations applied to them very easily. An example is
+a basic \texttt{AND/OR} algorithm by taking the $\min$ and
+$\max$ of the two functions, or the deformation of
+\emph{meta balls}, which is a set of sum of gaussians.
+
+\subsection{Signed Distance Functions} \label{SDFs}
+
+Following \cite{wave1} and \cite{SDF1}, a \emph{SDF} is a function that
+determines the \emph{distance} from an arbitrary point in space to the
+object in question. In 2D space, for example, imagine we had
+a shape $\mathcal{S}$, and we pick some arbitrary point 
+$\bf{x}$ in the space around the shape, $\mathcal{M}$. We want
+a point $\bf{p} \in \mathcal{S}$ that \emph{minimizes} the distance
+function between the point in the shape and the point in space:
+
+\begin{align*}
+    \min \text{distance}(\bf{x}, \cal{S}) = d(\bf{x,p})
+\end{align*}
+
+To produce the function 
+$\text{SDF}(\bf{x,p}) : \RR^n\rightarrow\RR$ that
+takes a point in $n-$dimensional space and spits out a distance scalar,
+we add an aditonal constraint to this distance function:
+
+\begin{align*}
+\text{SDF}(\bf{x,p}) =
+\begin{cases}
+\ \ d(\bf{x,p}), \quad \text{if }\bf{x} \notin \mathcal{S} \ \text{(exterior)}
+ \\
+-d(\bf{x,p}), \quad \text{if }\bf{x} \in \mathcal{S} \ \text{(interior)}
+\end{cases}
+\end{align*}
+
+That is, if you pick a point \emph{inside} the shape, it'll also
+register the distance, but it'll be negative. The points \emph{on}
+the shape have 0 distance, and so are not signed. There are also
+simpler but less used \emph{indicator functions} that return 1 outside
+and $-1$ inside.
+
+\spa
+
+One can have \emph{exact} and \emph{approximate} SDFs. An 
+\emph{exact} SDF obeys the \emph{eikonal equation} $|\grad f| = 1$, as is
+explained by \cite{wave1} in equation 6. The idea being very simple:
+imagine we have a tank of water, and we twist a metal wire in the shape 
+we want, and then we \emph{splash} that shape in the water.
+
+\spa
+
+The outward and inward propagating waves out of this splash produce
+exactly the level sets of distance of our shape; so, if we compute how
+a wave propagates in that way, and grab the level sets or the wave fronts
+of the wave over time, we get the SDF. We can also prove the eikonal
+condition using some functional inequalities \cite{wave2}.
+
+\spa
+
+Now to render and use these things we want to do some kind of algorithm
+that checks the closest point to the shape at any moment. This is pretty
+trivial to do with \emph{sphere tracing}. As the name implies, you pick
+some point $\bf{x}$, draw a \emph{circle} $C$ around said point,
+and start expanding its radius. At some point it'll touch some bit of
+the shape, and that's the nearest bit to $\bf{x}$ \cite{SDF2}.
+Easy right?
+
+\spa
+
+To construct more sophisticated SDFs we wish to use methods
+to join basic, exact SDFs into other, more complicated shapes.
+The basic procedure is to apply various \emph{boolean operations}
+to the SDF, union, intersections and such, that produce new SDFs.
+I'm not sure how this procedure is exactly done yet.
+
+\subsection{Conversions between geometric representations}
+
+Some things are impossible to do in certain representations. Animations
+are near-inconceivable using parametric surfaces, but trivial in meshes.
+How does one convert between these types of objects, without losing too
+much information?

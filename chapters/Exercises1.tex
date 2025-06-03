@@ -1,0 +1,307 @@
+\chapter{Exercises from SGI}
+
+\section{Exercises 1-13}
+\subsection{Finding boundary edges}
+
+Here's the idea; if we imagine that each face is stored
+as a row $[\bf{v_1, v_2, v_3}]$ in the face matrix
+$\bf{F}$, and we want to find boundary edges, we must
+find pairs $\bf{(v_1, v_2)}$, not necessarily in order,
+that don't repeat in any row.
+
+\spa
+
+Since we're indexing $\bf{v}_i$ as numbers in each row,
+we then are tasked to find all sets of non-repeating tuples
+across a matrix $n \times 3$ $\bf{F}$.
+
+\begin{algorithm}
+\caption{Finding boundary edges of a mesh by substring counting}
+\begin{algorithmic}[1]
+\Procedure{BoundEdges1}{$\bf{F}$}
+
+\State $\bf{F} \gets \RR^{n \times 3}$
+\Comment{Initialize face matrix}
+    
+    \State $\bf{A} \gets \bf{F}[i,:]$
+    \Comment{Gets all elements from row $i$}
+    \For{$i = 0, \cdots, n$}
+    \For{$j = 0, \cdots, n$}
+    \For{$k = 0, \cdots, n$}
+    \EndFor
+    
+    
+\State \Return UPairs
+\State $\bf{BE} \gets \text{UPairs}$
+\State \textbf{print(BE)}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+This algorithm runs in $\mathcal{O}(k^2n)$ time, where
+$n$ is the number of rows in $\bf{F}$, and $k$ is the
+number of columns. Therefore it becomes a $O(n)$ algorithm
+in regards to number of faces.
+
+
+\subsection{Finding boundary length}
+
+This one is easy. Once we have all boundary edges,
+we can take the distance between the vertices of each edge,
+and then repeat the process for all edges.
+
+\begin{algorithm}
+\caption{Finding total boundary perimeter}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Per-face normals}
+
+Every face is identified with a collection
+$\bf{(v_1,v_2,v_3)}$ of vertices, where their
+orientation is counter-clockwise; by producing
+the vectors $\bf{(v_2-v_1)=v_a}$ and $\bf{(v_3-v_1)=v_b}$
+we can produce the normal vector $\bf{v_a \times v_b}$.
+However, we must then normalize it by grabbing the
+magnitude of $\bf{|v_a \times v_b|}$ and dividing
+it to our acquired vector.
+
+\begin{algorithm}
+\caption{Vector normalization algorithm}
+\begin{algorithmic}[1]
+\Procedure{VNorm}{$\bf{v}$}
+\State $\bf{v} \gets \RR^n$ \Comment{Load vector}
+\State $f \gets 0$
+    \For{$i = 0, \cdots, n$}
+    \State $f \gets f + \bf{v}[i]^2$
+    \State $f \gets \sqrt{f}$
+    \State $\bf{v}[i] \gets \bf{v}[i]/f$
+    \State \Return $\bf{v}[i]$ \Comment{Normalized vector}
+    \EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Finding the normal of a face}
+\begin{algorithmic}[1]
+\Procedure{FaceNorm}{$\bf{F}$}
+\State $\bf{F} \gets \RR^{n \times 3}$
+\State $\bf{V} \gets \RR^{n \times 3}$
+\For{$i = 0, \cdots, n-1$}
+    \State $\bf{A} \gets \bf{F}[i, :]$ 
+    \Comment{Acquire a row of $\bf{F}$}
+    \State $\bf{A[V[0, j]]}$
+    \State $\bf{v_a = A[V[0,1]] - A[V[0,0]]} $
+    \State $\bf{v_b = A[V[0,2]] - A[V[0,0]]} $
+    \State $\bf{n} \gets \text{Cross}(\bf{v_a,v_b})$
+    \State $\bf{n} \gets \text{VNorm}(\bf{n})$ \Comment{Normalize}
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+This procedures occurs in $\mathcal{O}(n)$ time.
+
+\subsection{Per-vertex normals}
+
+As discussed in section \ref{per-vertex-normals}, to compute
+the  per-vertex normal we need to first sample all the faces
+around a given vertex, compute all of their normal vectors,
+compute the associated \emph{weight factor}, and then
+sum them all together. After that we normalize this final
+vector.
+
+\begin{algorithm}
+\caption{Per-vertex normal}
+\begin{algorithmic}[1]
+\Procedure{PVNorm}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Flipped normals}
+
+We just take the vector array and negate all its
+three components $\bf{n \rightarrow -n}$.
+Not really sure if there is a sophisticated idea behind
+this one that's better.
+
+\begin{algorithm}
+\caption{Vector flipping algorithm}
+\begin{algorithmic}[1]
+\Procedure{VNorm}{$\bf{v}$}
+\State $\bf{v} \gets \RR^n$ \Comment{Load vector}
+    \For{$i = 0, \cdots, n$}
+    \State $\bf{v}[i] \gets -\bf{v}[i]$ \Comment{Negate components}
+    \State \Return $\bf{v}[i]$ \Comment{Flipped vector}
+    \EndFor  
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Tangents}
+
+According to \cite{tangent1, tangent2, foundationsofgameengine1}, after
+acquiring $\bf{(v_2-v_1)=v_a}$ and $\bf{(v_3-v_1)=v_b}$,
+we can acquire the \emph{tangent vector} $\bf{t}$
+and \emph{bitangent vector} $\bf{b}$, both compose a
+basis on the face, by solving a linear system:
+
+\begin{align*}
+    [\bf{v_a} \ \bf{v_b}] = [\bf{t  \ \ b}]
+    \begin{pmatrix}
+ x_1 & x_2 \\
+ y_1  & y_2
+\end{pmatrix}
+\end{align*}
+
+Where $\{\bf{x, y}\}$
+This can be done by inverting the right-hand side matrix and multiplying:
+
+\begin{align*}
+    [\bf{t  \ \ b}] = (x_1 y_2 - x_2 y_1)^{-1} [\bf{v_a \ \ v_b}]
+\begin{pmatrix}
+ y_2 & -x_2 \\
+ -y_1  & x_1
+\end{pmatrix}
+\end{align*}
+
+
+
+\begin{algorithm}
+\caption{Finding tangent vectors}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Angle Defect} \label{angle-defect-algorithm}
+
+As per \cite{discreteexterior1} and \ref{curvature}, the
+total discrete angle defect in a mesh is given by:
+
+\begin{align*}
+    \theta_{\text{def}}(\bf{v}) = 2\pi - \sum_{f \in F}
+    \text{Interior Angle}(\bf{v})
+\end{align*}
+
+Therefore, as in the per-vertex normal case, we must pick a vertex 
+$\bf{v}$, loop around the faces $F$ around the vertex, and at each one
+compute the total interior angle $\theta_i$ based around $\bf{v}$,
+and then assign the value of the formula for that vertex.
+We then do this for all vertices in the mesh.
+
+\spa
+
+Now to compute the interior angles, we need to produce
+two vectors $\bf{(v_a,v_b)}$ whose origin is the
+vertex $\bf{v}$, and then perform a numerically stable
+routine as per \cite{float3}.
+
+
+\begin{algorithm}
+\caption{Finding angle defect $\theta$ across entire mesh}
+\begin{algorithmic}[1]
+\Procedure{AngDef}{$\bf{F, V}$}
+
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Four corners}
+
+\begin{algorithm}
+\caption{Finding total boundary perimeter}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{My diagonals}
+
+\begin{algorithm}
+\caption{Finding total boundary perimeter}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Sparse matrix with a triangular nonzero pattern}
+
+\begin{algorithm}
+\caption{Finding total boundary perimeter}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Upsample}
+
+\begin{algorithm}
+\caption{Finding total boundary perimeter}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Grad}
+
+\begin{algorithm}
+\caption{Evaluating the gradient}
+\begin{algorithmic}[1]
+\Procedure{Grad}{$\bf{V,F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Critical Points}
+
+\begin{algorithm}
+\caption{Finding critical points in mesh}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Cotangent Laplacian from grad}
+
+\begin{algorithm}
+\caption{Cotangent Laplacian from grad}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Cotangent Laplacian from entries}
+
+
+\begin{algorithm}
+\caption{Cotangent Laplacian from entries}
+\begin{algorithmic}[1]
+\Procedure{BoundLen}{$\bf{F}$}
+
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
