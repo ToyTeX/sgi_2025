@@ -1,0 +1,131 @@
+From 74cc874d6070d4b712bc8ab99ba80f8a642eec74 Mon Sep 17 00:00:00 2001
+From: Skyler Marks <skyler@skylermarks.com>
+Date: Wed, 11 Jun 2025 14:36:06 -0400
+Subject: [PATCH] Fix some errors:
+
+    - Include the correct file for the cover
+    - Include another package to fix an error in chapter 3
+    - Comment out an image that doesn't exist
+    - In Exercises1.tex, there were two \BeginFor's that needed \EndFor's
+    - esoterica.tex needed an underscore escaped
+    - Comment out missing chapters
+
+TODO:
+    - Find that image! It's commented out.
+    - There are still four missing chapters. I commented their includes
+      out, but that should be fixed
+---
+ chapters/Exercises1.tex |  6 +++---
+ chapters/day4.tex       |  4 ++--
+ chapters/esoterica.tex  |  4 ++--
+ main.tex                | 13 +++++++------
+ 4 files changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/chapters/Exercises1.tex b/chapters/Exercises1.tex
+index 3fbf810..5416115 100644
+--- a/chapters/Exercises1.tex
++++ b/chapters/Exercises1.tex
+@@ -29,8 +29,8 @@ across a matrix $n \times 3$ $\bf{F}$.
+     \For{$j = 0, \cdots, n$}
+     \For{$k = 0, \cdots, n$}
+     \EndFor
+-    
+-    
++    \EndFor
++    \EndFor
+ \State \Return UPairs
+ \State $\bf{BE} \gets \text{UPairs}$
+ \State \textbf{print(BE)}
+@@ -304,4 +304,4 @@ routine as per \cite{float3}.
+ 
+ \EndProcedure
+ \end{algorithmic}
+-\end{algorithm}
+\ No newline at end of file
++\end{algorithm}
+diff --git a/chapters/day4.tex b/chapters/day4.tex
+index 917f4ed..0f63561 100644
+--- a/chapters/day4.tex
++++ b/chapters/day4.tex
+@@ -203,7 +203,7 @@ parametrization algorithms
+ 
+ \begin{figure}[h]
+     \centering
+-    \includegraphics[width=0.6\linewidth]{images/param1.png}
++    % \includegraphics[width=0.6\linewidth]{images/param1.png} % This image doesn't exist...
+     \caption{Assigning a bijective coordinate map to coarse mesh
+     from fine mesh}
+ \end{figure}
+@@ -222,4 +222,4 @@ Basic linear solvers of the form $\bf{Ax = v}$
+     \item \textbf{Relaxation 2}
+ \end{itemize}
+ 
+-Garlekin multigrid introduces a \emph{prolongation matrix} $\bf{P}$
+\ No newline at end of file
++Garlekin multigrid introduces a \emph{prolongation matrix} $\bf{P}$
+diff --git a/chapters/esoterica.tex b/chapters/esoterica.tex
+index 0c9870c..6c12007 100644
+--- a/chapters/esoterica.tex
++++ b/chapters/esoterica.tex
+@@ -9,7 +9,7 @@ https://cses.fi/book/book.pdf
+ 
+ \section*{Justin Solomon}
+ Troutman and Gelfand/Fomin variatonal calculus
+-https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf
++https://web.stanford.edu/~boyd/cvxbook/bv\_cvxbook.pdf
+ https://www.matrixcalculus.org/
+ https://www.matrixcalculus.org/matrixcalculus.pdf
+ https://www.matrixcalculus.org/tensorcalculus.pdf
+@@ -17,4 +17,4 @@ https://www.matrixcalculus.org/tensorcalculus.pdf
+ \section*{Anthony Hong}
+ https://tikzcd.yichuanshen.de/
+ https://tikzit.github.io/
+-https://www.jmilne.org/not/CDGuide.html
+\ No newline at end of file
++https://www.jmilne.org/not/CDGuide.html
+diff --git a/main.tex b/main.tex
+index 4919306..21e990e 100644
+--- a/main.tex
++++ b/main.tex
+@@ -21,6 +21,7 @@
+ \usepackage{tabularx}           % Tables with flexible column widths
+ \usepackage{array}              % Extra functionality for tables
+ \usepackage{siunitx}            % For units and numerical data
++\usepackage{arydshln}			% For Chapter 3
+ 
+ % Figures and Colors
+ \usepackage{pdfpages}
+@@ -61,7 +62,7 @@
+ 
+ \begin{document}
+ 
+-\includepdf[pages=1, fitpaper=true]{images/NotesCover.pdf}
++\includepdf[pages=1, fitpaper=true]{SGI_2025_cover.pdf}
+ 
+ \tableofcontents
+ \pagestyle{plain}
+@@ -71,10 +72,10 @@
+ \input{chapters/day4}
+ \input{chapters/day5}
+ 
+-\input{chapters/Proj1 - MDs (Nicholas Sharp)}
+-\input{chapters/Proj2 - SDFs (Odet-Silvia)}
+-\input{chapters/Proj3 - INR (Zhang-Marschner)}
+-\input{chapters/Proj4 - Eigenvalues (Yingying Yu)}
++%	\input{chapters/Proj1 - MDs (Nicholas Sharp)}       % Missing
++%	\input{chapters/Proj2 - SDFs (Odet-Silvia)}         % Missing
++%	\input{chapters/Proj3 - INR (Zhang-Marschner)}      % Missing
++%	\input{chapters/Proj4 - Eigenvalues (Yingying Yu)}  % Missing
+ 
+ \input{chapters/Exercises1}
+ \input{chapters/Exercises2}
+@@ -88,4 +89,4 @@
+ \bibliography{biblio1}
+ \onecolumn
+ 
+-\end{document}
+\ No newline at end of file
++\end{document}
+-- 
+2.49.0
+
